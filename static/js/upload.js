@@ -6,7 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const videoPreview = document.getElementById('video-preview');
   const fileName = document.getElementById('file-name');
   const buttonsContainer = document.getElementById('buttons-container');
-  
+  const videoObjectDetectionButton = document.getElementById('video-object-detection');
+  const processedVideoContainer = document.getElementById('processed-video-container');
+  const processedVideo = document.getElementById('processed-video');
+  const downloadButton = document.getElementById('download-button');
+
+  let uploadedFile;
+
   // When the "Select from device" button is clicked, trigger the file input click
   uploadButton.addEventListener('click', function() {
     fileInput.click();
@@ -39,6 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Show the buttons below the video
       buttonsContainer.style.display = 'flex';
+
+      uploadedFile = selectedFile; // Save the selected file for later use
     } else {
       // Reset everything if no file is selected
       document.getElementById('file-logo').style.display = 'block';
@@ -49,83 +57,51 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Add click event listeners for the buttons (for testing purposes)
-  document.getElementById('video-object-detection').addEventListener('click', function() {
-    alert('Video Object Detection button clicked!');
-    // Call your function here for video object detection
+  // When the "Video Object Detection" button is clicked
+  videoObjectDetectionButton.addEventListener('click', function() {
+    if (uploadedFile) {
+      const formData = new FormData();
+      formData.append('video', uploadedFile);
+
+      // Display processing message
+      alert('Processing the video with Object Detection...');
+
+      // Send the video to the backend for processing
+      fetch('/process_video', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Processing completed!');
+
+          // Show the processed video and download button
+          processedVideoContainer.style.display = 'block';
+          processedVideo.src = data.output_video_url; // Set the processed video URL
+          downloadButton.style.display = 'block';
+          downloadButton.href = data.output_video_url; // Set the download link
+        } else {
+          alert('Error processing video: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error processing the video.');
+      });
+    } else {
+      alert('Please upload a video first!');
+    }
   });
 
-  document.getElementById('video-object-tracking').addEventListener('click', function() {
-    alert('Video Object Tracking button clicked!');
-    // Call your function here for video object tracking
-  });
-
-  document.getElementById('process-dense-optical-flow').addEventListener('click', function() {
-    alert('Processing video with Dense Optical Flow!');
-    // Call your function here for dense optical flow processing
-  });
-
-  document.getElementById('process-sparse-optical-flow').addEventListener('click', function() {
-    alert('Processing video with Sparse Optical Flow!');
-    // Call your function here for sparse optical flow processing
-  });
-});
-
-// Function to open the sidebar
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-}
-
-// Function to close the sidebar
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-}
-
-// Example functions for the sidebar items
-function goToDashboard() {
-  alert('Dashboard clicked');
-  closeSidebar(); // Close sidebar after action
-}
-
-function goToProfile() {
-  alert('Profile clicked');
-  closeSidebar();
-}
-
-function goToSignIn() {
-  alert('Sign In clicked');
-  closeSidebar();
-}
-
-function goToSupport() {
-  alert('Support clicked');
-  closeSidebar();
-}
-
-function loginClicked() {
-  alert('Login clicked');
-  closeSidebar();
-}
-
-// Function for the Desktop button
-function goToDesktop() {
-  alert("Desktop button clicked!");
-  // Add your code for the Desktop action here
-}
-
-// Function for the Login button
-function loginClicked() {
-  alert("Log In button clicked!");
-  // Add your code for the login action here
-}
-
-// Function to format file size in KB or MB
-function formatFileSize(sizeInBytes) {
-  if (sizeInBytes < 1024) {
-    return sizeInBytes + ' bytes';
-  } else if (sizeInBytes < 1024 * 1024) {
-    return (sizeInBytes / 1024).toFixed(2) + ' KB';
-  } else {
-    return (sizeInBytes / (1024 * 1024)).toFixed(2) + ' MB';
+  // Function to format file size in KB or MB
+  function formatFileSize(sizeInBytes) {
+    if (sizeInBytes < 1024) {
+      return sizeInBytes + ' bytes';
+    } else if (sizeInBytes < 1024 * 1024) {
+      return (sizeInBytes / 1024).toFixed(2) + ' KB';
+    } else {
+      return (sizeInBytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
   }
-}
+});
