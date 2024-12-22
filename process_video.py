@@ -21,25 +21,23 @@ if not os.path.exists(output_folder):
 # Define the output file path with a filename
 # output_file_path = os.path.join(output_folder, "processed_video.mp4")  # This is passed from Flask now
 
+# Reduce unnecessary logging: Only print every 5 seconds for frame-level data
 def forFrame(frame_number, output_array, output_count):
-    print("FOR FRAME ", frame_number)
-    print("Output for each object : ", output_array)
-    print("Output count for unique objects : ", output_count)
-    print("------------END OF A FRAME --------------")
+    # Print data every 5th frame (you can adjust this as needed)
+    if frame_number % 5 == 0:
+        print(f"Frame {frame_number}: {output_count} unique objects detected.")
+        print("Detected Objects:", output_array)
 
 def forSeconds(second_number, output_arrays, count_arrays, average_output_count):
-    print("SECOND : ", second_number)
-    print("Array for the outputs of each frame ", output_arrays)
-    print("Array for output count for unique objects in each frame : ", count_arrays)
-    print("Output average count for unique objects in the last second: ", average_output_count)
-    print("------------END OF A SECOND --------------")
+    # Print data every 30 seconds
+    if second_number % 30 == 0:
+        print(f"Second {second_number}: {average_output_count} objects detected on average.")
+        print("Object Count per Frame:", count_arrays)
 
 def forMinute(minute_number, output_arrays, count_arrays, average_output_count):
-    print("MINUTE : ", minute_number)
-    print("Array for the outputs of each frame ", output_arrays)
-    print("Array for output count for unique objects in each frame : ", count_arrays)
-    print("Output average count for unique objects in the last minute: ", average_output_count)
-    print("------------END OF A MINUTE --------------")
+    # Print data every minute
+    print(f"Minute {minute_number}: Average object count per second is {average_output_count}")
+    print("Detected Objects per Frame:", output_arrays)
 
 # Initialize the video detector
 video_detector = VideoObjectDetection()

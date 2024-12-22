@@ -1,21 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Get references to elements
   const uploadButton = document.getElementById('upload');
-  const uploadText = document.getElementById('upload-text');
   const fileInput = document.getElementById('file-input');
   const videoPreview = document.getElementById('video-preview');
   const fileName = document.getElementById('file-name');
   const buttonsContainer = document.getElementById('buttons-container');
-  const videoObjectDetectionButton = document.getElementById('video-object-detection');
-  const processedVideoContainer = document.getElementById('processed-video-container');
-  const processedVideo = document.getElementById('processed-video');
-  const downloadButton = document.getElementById('download-button');
-
   let uploadedFile;
 
-  // When the "Select from device" button is clicked, trigger the file input click
+  // When the "Select from device" button is clicked, reset the file input value and trigger click
   uploadButton.addEventListener('click', function() {
-    fileInput.click();
+    fileInput.value = '';  // Reset the input value to ensure it triggers the change event
+    fileInput.click();     // Open the file input dialog
   });
 
   // When a file is selected, display the file name, size, and video preview
@@ -57,43 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // When the "Video Object Detection" button is clicked
-  videoObjectDetectionButton.addEventListener('click', function() {
-    if (uploadedFile) {
-      const formData = new FormData();
-      formData.append('video', uploadedFile);
-
-      // Display processing message
-      alert('Processing the video with Object Detection...');
-
-      // Send the video to the backend for processing
-      fetch('/process_video', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Processing completed!');
-
-          // Show the processed video and download button
-          processedVideoContainer.style.display = 'block';
-          processedVideo.src = data.output_video_url; // Set the processed video URL
-          downloadButton.style.display = 'block';
-          downloadButton.href = data.output_video_url; // Set the download link
-        } else {
-          alert('Error processing video: ' + data.message);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('There was an error processing the video.');
-      });
-    } else {
-      alert('Please upload a video first!');
-    }
-  });
-
   // Function to format file size in KB or MB
   function formatFileSize(sizeInBytes) {
     if (sizeInBytes < 1024) {
@@ -105,3 +63,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('open');
+}
+// Function to close the sidebar by removing the 'open' class
+function closeSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.remove('open'); // Removes the 'open' class, closing the sidebar
+}
